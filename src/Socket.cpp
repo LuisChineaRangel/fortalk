@@ -10,13 +10,33 @@
 //////////////////////////////////////////////////////////////////
 #include "../include/Socket.hpp"
 
-/// @brief Socket's Default Constructor
-/// @param address Address assigned to Socket
-Socket::Socket(const sockaddr_in& address) : fd_(socket(DOMAIN, TYPE, PROTOCOL)) {
+/// @brief Socket's Constructor
+/// @param ipAddress Address assigned to Socket
+/// @param port Port assigned to Socket
+Socket::Socket(const string& ipAddress, const int& port) {
+	const sockaddr_in address = makeIpAddress(ipAddress, port);
+	createSocket();
+	bindSocket(address);
+}
+
+/// @brief Socket's Constructor
+/// @param address sockaddr_in assigned to Socket
+Socket::Socket(const sockaddr_in& address) {
+	createSocket();
+	bindSocket(address);
+}
+
+/// @brief Assigning the file descriptor to Socket
+void Socket::createSocket() {
+	fd_ = socket(DOMAIN, TYPE, PROTOCOL);
 	if (fd_ < 0)
 		throw system_error(errno, system_category(), "Couldn't create Socket");
-	
-    if (bind(fd_, (const sockaddr*) &address, sizeof(address)) < 0)
+}
+
+/// @brief Binding address to Socket
+/// @param address sockaddr_in to bind
+void Socket::bindSocket(const sockaddr_in& address) {
+	if (bind(fd_, (const sockaddr*) &address, sizeof(address)) < 0)
         throw system_error(errno, system_category(), "Couldn't bind Socket");
 }
 
@@ -33,18 +53,17 @@ void Socket::sendTo(const Message& message, const sockaddr_in& address) {
 	}
 }
 
+/// @brief Method to receive messages
 void Socket::receiveFrom(Message& message, sockaddr_in& address) {
 	socklen_t src_len = sizeof(address);
-	
 	if (recvfrom(fd_, &message, sizeof(message), 0, reinterpret_cast<sockaddr*>(&address), &src_len) < 0) {
 		throw system_error(errno, system_category(), "Error receiving message");
 	}
 	
-	message.text[1023] = '\0';
-	int remotePort = ntohs(address.sin_port);
-	string remoteIp = inet_ntoa(address.sin_addr);
-	
-	cout << message.user.data() << "(" << remoteIp << "," << remotePort << "): " << message.text.data() << endl;
+	message.text[1023] = 0x00;
+	Modifier green(FG_GREEN);
+	Modifier def(FG_DEFAULT);
+	cout << green << message.user.data() << "[" << message.ip.data() << ", " << message.port << "]: " << def << message.text.data() << endl;
 }
 
 /// @brief Assign the Ip Address and Port and returns a sockaddr_in

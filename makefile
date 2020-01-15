@@ -16,11 +16,11 @@ OBJECTS_DIR=build
 SRC_DIR =src
 LIB_DIR =lib
 BIN_DIR =bin
-IDIR=-I -Wall -Wextra
+IDIR=-I -Wall -Wextra -pthread
 
 LIBS=-lm
 
-_OBJ = main.o Socket.o
+_OBJ = main.o Talk.o Socket.o
 OBJ = $(patsubst %,$(OBJECTS_DIR)/%,$(_OBJ))
 
 BIN_NAME = Talk
@@ -31,9 +31,12 @@ Talk: $(OBJ)
 	$(CC) -o $(BIN_DIR)/$(BIN_NAME) $^ $(CFLAGS) $(LIBS)
 
 $(OBJECTS_DIR)/Socket.o: $(SRC_DIR)/Socket.cpp
+	$(CC) -c -o $@ $< $(CFLAGS)	
+	
+$(OBJECTS_DIR)/Talk.o: $(SRC_DIR)/Talk.cpp
 	$(CC) -c -o $@ $< $(CFLAGS)		
 
-$(OBJECTS_DIR)/main.o: $(SRC_DIR)/main.cpp $(INCLUDE_DIR)/Socket.hpp
+$(OBJECTS_DIR)/main.o: $(SRC_DIR)/main.cpp
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 run:
@@ -42,6 +45,6 @@ run:
 .PHONY: clean
 
 clean:
-	@rm -f $(OBJECTS_DIR)/*.o *~ $(INCLUDE_DIR)/*~ $(BIN_DIR)/*.exe
+	@rm -f $(OBJECTS_DIR)/*.o *~ $(BIN_DIR)/*~ $(BIN_DIR)/*.exe
 	@echo
 	@echo "Objects Files and Executables cleaned!"

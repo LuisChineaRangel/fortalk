@@ -1,12 +1,10 @@
 # Talk with File Submission
-.
 
 ## Compilation
 
 To compile the program, execute `make` command.
 
 	$ make
-
 
 ## Usage
 
