@@ -20,20 +20,20 @@ IDIR=-I -Wall -Wextra
 
 LIBS=-lm
 
-_OBJ = NetCp.o Socket.o
+_OBJ = main.o Socket.o
 OBJ = $(patsubst %,$(OBJECTS_DIR)/%,$(_OBJ))
 
-BIN_NAME = NetCp
+BIN_NAME = Talk
 
-all: NetCp
+all: Talk
 
-NetCp: $(OBJ)
+Talk: $(OBJ)
 	$(CC) -o $(BIN_DIR)/$(BIN_NAME) $^ $(CFLAGS) $(LIBS)
 
 $(OBJECTS_DIR)/Socket.o: $(SRC_DIR)/Socket.cpp
 	$(CC) -c -o $@ $< $(CFLAGS)		
 
-$(OBJECTS_DIR)/NetCp.o: $(SRC_DIR)/NetCp.cpp $(INCLUDE_DIR)/Socket.hpp
+$(OBJECTS_DIR)/main.o: $(SRC_DIR)/main.cpp $(INCLUDE_DIR)/Socket.hpp
 	$(CC) -c -o $@ $< $(CFLAGS)
 
 run:

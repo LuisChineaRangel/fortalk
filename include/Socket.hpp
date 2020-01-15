@@ -9,12 +9,16 @@
 /// alu0101118116@ull.es
 //////////////////////////////////////////////////////////////////
 #pragma once
+
 #include <array>
 #include <string>
 #include <cstdlib>
 #include <iostream>
-#include <unistd.h>
 #include <exception>
+
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/stat.h>
 #include <arpa/inet.h>
 #include <sys/types.h>
 #include <sys/socket.h>

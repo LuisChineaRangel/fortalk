@@ -35,6 +35,7 @@ void Socket::sendTo(const Message& message, const sockaddr_in& address) {
 
 void Socket::receiveFrom(Message& message, sockaddr_in& address) {
 	socklen_t src_len = sizeof(address);
+	
 	if (recvfrom(fd_, &message, sizeof(message), 0, reinterpret_cast<sockaddr*>(&address), &src_len) < 0) {
 		throw system_error(errno, system_category(), "Error receiving message");
 	}
