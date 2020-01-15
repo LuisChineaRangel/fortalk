@@ -29,8 +29,7 @@ class Talk {
 	public:
 		Talk(const string& = {}, const int& = 0, bool = false);
 		~Talk();
-		
+
 		void sendFile(const char*, const sockaddr_in&);
 		void receiveFile(sockaddr_in&);
 };
-

@@ -30,22 +30,22 @@ void Talk::sendFile(const char* path, const sockaddr_in& remote) {
 	char* b = buffer;
 	int  bufferSize = sizeof(buffer) / sizeof(char);	
 	int fdFile = open(path, O_RDONLY);
-	
+
 	size_t bytesRead = BUFFER_SIZE;
 	bytesRead = read(fdFile, b, BUFFER_SIZE);
-	
+
 	while (bytesRead > 0) {
 		Message message;
-		
+
 		int port = ntohs(remote.sin_port);
 		string ip = inet_ntoa(remote.sin_addr);
 		string text = string(buffer, bufferSize);
-		
+
 		message.port = port;
 		ip.copy(message.ip.data(), message.ip.size() - 1, 0);
 		text.copy(message.text.data(), message.text.size() - 1, 0);
 		message.text[bytesRead] = 0x00;
-		
+
 		socketTalk.sendTo(message, remote);
 		bytesRead = read(fdFile, b, BUFFER_SIZE);
 	}

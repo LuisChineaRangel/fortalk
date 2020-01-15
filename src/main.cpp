@@ -22,7 +22,7 @@ int main(int argc, char* argv[]) {
 	try {
 		Talk myTalk("127.0.0.1", 0);
 		sockaddr_in remote = makeIpAddress("127.0.0.1", 10);
-
+		
 		cout << "-----------------------------------------------------------------------" << endl;
 		cout << "Write the path of the file you desire to send: ";
 		string text;
@@ -37,7 +37,7 @@ int main(int argc, char* argv[]) {
 		cout << "-----------------------------------------------------------------------" << endl;
 		return 1;
 	}
-	
+
 	catch (system_error& e) {
 		cout << "-----------------------------------------------------------------------" << endl;
 		cout << e.what() << endl;
@@ -55,5 +55,5 @@ int main(int argc, char* argv[]) {
 
 /// @brief User's Manual
 void help() {
-	
+
 }

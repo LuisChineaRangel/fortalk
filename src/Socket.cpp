@@ -37,7 +37,7 @@ void Socket::createSocket() {
 /// @param address sockaddr_in to bind
 void Socket::bindSocket(const sockaddr_in& address) {
 	if (bind(fd_, (const sockaddr*) &address, sizeof(address)) < 0)
-        throw system_error(errno, system_category(), "Couldn't bind Socket");
+		throw system_error(errno, system_category(), "Couldn't bind Socket");
 }
 
 /// @brief Socket's Destructor
@@ -59,7 +59,7 @@ void Socket::receiveFrom(Message& message, sockaddr_in& address) {
 	if (recvfrom(fd_, &message, sizeof(message), 0, reinterpret_cast<sockaddr*>(&address), &src_len) < 0) {
 		throw system_error(errno, system_category(), "Error receiving message");
 	}
-	
+
 	message.text[1023] = 0x00;
 	Modifier green(FG_GREEN);
 	Modifier def(FG_DEFAULT);
@@ -72,8 +72,8 @@ void Socket::receiveFrom(Message& message, sockaddr_in& address) {
 sockaddr_in makeIpAddress(const string& ipAddress, int port) {
 	sockaddr_in localAddress{};
 	localAddress.sin_family = AF_INET;
-    localAddress.sin_port = htons(port);
-
+	localAddress.sin_port = htons(port);
+	
 	if (ipAddress.empty()) {
 		localAddress.sin_addr.s_addr = htonl(INADDR_ANY);
 	}
