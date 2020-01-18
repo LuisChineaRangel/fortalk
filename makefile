@@ -8,6 +8,10 @@
 # Contact E-mail: alu0101118116@ull.es
 #-----------------------------------------------------------------------------------
 
+YELLOW=\033[1;33m
+BLUE=\033[0;32m
+DEF=\033[0m
+
 CC=g++
 CFLAGS=$(IDIR) -std=c++11 -g
 
@@ -46,5 +50,4 @@ run:
 
 clean:
 	@rm -f $(OBJECTS_DIR)/*.o *~ $(BIN_DIR)/*~ $(BIN_DIR)/*.exe
-	@echo
-	@echo "Objects Files and Executables cleaned!"
+	@echo -e "${BLUE}Make: ${YELLOW}Objects Files and Executables cleaned!${DEF}"

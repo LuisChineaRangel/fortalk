@@ -59,11 +59,8 @@ void Socket::receiveFrom(Message& message, sockaddr_in& address) {
 	if (recvfrom(fd_, &message, sizeof(message), 0, reinterpret_cast<sockaddr*>(&address), &src_len) < 0) {
 		throw system_error(errno, system_category(), "Error receiving message");
 	}
-
+	message.ip[19] = 0x00;
 	message.text[1023] = 0x00;
-	Modifier green(FG_GREEN);
-	Modifier def(FG_DEFAULT);
-	cout << green << message.user.data() << "[" << message.ip.data() << ", " << message.port << "]: " << def << message.text.data() << endl;
 }
 
 /// @brief Assign the Ip Address and Port and returns a sockaddr_in

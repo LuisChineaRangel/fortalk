@@ -13,8 +13,8 @@
 #include <array>
 #include <string>
 #include <cstdlib>
-#include <iostream>
 #include <exception>
+
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/stat.h>
@@ -33,6 +33,8 @@ using namespace Color;
 
 /// @brief Message Structure
 struct Message {
+	/// @brief Indicates if it's File or Text Message
+	bool file = false;
 	/// @brief Sender's Ip
 	array<char, 20> ip;
 	/// @brief Sender's port
@@ -50,7 +52,7 @@ class Socket {
 		int fd_;
 	public:
 		Socket(const string&, const int&);
-		Socket(const sockaddr_in&);
+		Socket(const sockaddr_in& = sockaddr_in{});
 		~Socket();
 		
 		void sendTo(const Message&, const sockaddr_in&);

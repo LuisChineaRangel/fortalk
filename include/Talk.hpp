@@ -9,16 +9,23 @@
 /// alu0101118116@ull.es
 //////////////////////////////////////////////////////////////////
 #pragma once
+#include <atomic>
 #include <thread>
+#include <csignal>
+#include <pthread.h>
+#include <functional>
 
 #include "../include/Socket.hpp"
 
 #define BUFFER_SIZE 1023
+#define WHITESPACE " "
+
+extern atomic<bool> quit;
 
 /// @class Talk
 class Talk {
 	private:
-		/// Indicate if User is a Server or Client
+		/// Indicates if User is a Server or Client
 		bool serverMode;
 		/// User's Address
 		string ip;
@@ -30,6 +37,13 @@ class Talk {
 		Talk(const string& = {}, const int& = 0, bool = false);
 		~Talk();
 
-		void sendFile(const char*, const sockaddr_in&);
-		void receiveFile(sockaddr_in&);
+		void sendControl(const sockaddr_in&);
+		void receiveControl(sockaddr_in&);
+	private:	
+		void sendMessage(const sockaddr_in&, const string&);
+		void writeMessage(const Message&);
+		
+		void sendFile(const sockaddr_in&, const string&);
+		//void receiveFile(sockaddr_in&);
 };
+void threadHandler(Talk&);
