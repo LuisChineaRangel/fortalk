@@ -1,83 +1,97 @@
-/// @file Socket.cpp
-/// @brief Class Socket
-/// @author Luis Marcelo Chinea Rangel\n
-/// University of La Laguna\n
-/// Higher Polytechnic School of Engineering and Technology\n
-/// Undergraduate degree in Computer Engineering\n
-/// @date 11/01/2020
-/// @see Contact E-mail:
-/// alu0101118116@ull.es
-//////////////////////////////////////////////////////////////////
-#include "../include/Socket.hpp"
+/// @file Socket.hpp
+/// @brief Socket Class Source Code
+#include "Socket.hpp"
 
-/// @brief Socket's Constructor
-/// @param ipAddress Address assigned to Socket
+///////////////////////////////////////////////////////
+// CLASS MEMBER FUNCTIONS
+///////////////////////////////////////////////////////
+
+/// @brief Default Constructor
+/// @param ip_address Address assigned to Socket
 /// @param port Port assigned to Socket
-Socket::Socket(const string& ipAddress, const int& port) {
-	const sockaddr_in address = makeIpAddress(ipAddress, port);
-	createSocket();
-	bindSocket(address);
+Socket::Socket(const std::string& ip_address, const int& port) {
+  const sockaddr_in i_address = MakeInternetAddress(ip_address, port);
+  Build();
+  Bind(i_address);
 }
 
-/// @brief Socket's Constructor
-/// @param address sockaddr_in assigned to Socket
-Socket::Socket(const sockaddr_in& address) {
-	createSocket();
-	bindSocket(address);
+/// @brief Parameterized  Constructor
+/// @param i_address Internet Address
+Socket::Socket(const sockaddr_in& i_address) {
+  Build();
+  Bind(i_address);
 }
 
-/// @brief Assigning the file descriptor to Socket
-void Socket::createSocket() {
-	fd_ = socket(DOMAIN, TYPE, PROTOCOL);
-	if (fd_ < 0)
-		throw system_error(errno, system_category(), "Couldn't create Socket");
-}
-
-/// @brief Binding address to Socket
-/// @param address sockaddr_in to bind
-void Socket::bindSocket(const sockaddr_in& address) {
-	if (bind(fd_, (const sockaddr*) &address, sizeof(address)) < 0)
-		throw system_error(errno, system_category(), "Couldn't bind Socket");
-}
-
-/// @brief Socket's Destructor
+/// @brief Destructor
 Socket::~Socket() {
-	if(close(fd_) == 0)
-		fd_= 0;
+  if (close(fd_) == 0) fd_ = 0;
 }
 
-/// @brief Method to send messages
-void Socket::sendTo(const Message& message, const sockaddr_in& address) {
-	if (sendto(fd_, &message, sizeof(message), 0, reinterpret_cast<const sockaddr*>(&address), sizeof(address)) < 0) {
-		throw system_error(errno, system_category(), "Error sending message");
-	}
+/// @brief Build Method. Initializes the socket attributes
+/// @return Void
+void Socket::Build(void) {
+  fd_ = socket(DOMAIN, TYPE, PROTOCOL);
+  if (fd_ < 0)
+    throw std::system_error(errno, std::system_category(),
+                            "Couldn't create Socket");
 }
 
-/// @brief Method to receive messages
-void Socket::receiveFrom(Message& message, sockaddr_in& address) {
-	socklen_t src_len = sizeof(address);
-	if (recvfrom(fd_, &message, sizeof(message), 0, reinterpret_cast<sockaddr*>(&address), &src_len) < 0) {
-		throw system_error(errno, system_category(), "Error receiving message");
-	}
-	message.ip[19] = 0x00;
-	message.text[1023] = 0x00;
+/// @brief Bind Method. Binds socket to the user's address
+/// @param i_address sockaddr_in to bind
+/// @return Void
+void Socket::Bind(const sockaddr_in& i_address) {
+  if (bind(fd_, (const sockaddr*)&i_address, sizeof(i_address)) < 0)
+    throw std::system_error(errno, std::system_category(),
+                            "Couldn't bind Socket");
 }
 
-/// @brief Assign the Ip Address and Port and returns a sockaddr_in
-/// @param ipAdress Ip Address to assign
-/// @param port Port to assgin
-sockaddr_in makeIpAddress(const string& ipAddress, int port) {
-	sockaddr_in localAddress{};
-	localAddress.sin_family = AF_INET;
-	localAddress.sin_port = htons(port);
-	
-	if (ipAddress.empty()) {
-		localAddress.sin_addr.s_addr = htonl(INADDR_ANY);
-	}
-	else {
-		if (inet_aton(ipAddress.c_str(), &localAddress.sin_addr) == 0) {
-			throw system_error(errno, system_category(), "Invalid Address");
-		}
-	}
-	return localAddress;
+/// @brief SendTo Method. Sends a message to an specified address
+/// @param message Message to send
+/// @param i_address Receiver's address
+/// @return Void
+void Socket::SendTo(const Message& message, const sockaddr_in& i_address) {
+  if (sendto(fd_, &message, sizeof(message), 0,
+             reinterpret_cast<const sockaddr*>(&i_address),
+             sizeof(i_address)) < 0) {
+    throw std::system_error(errno, std::system_category(),
+                            "Error sending message");
+  }
+}
+
+/// @brief ReceiveFrom Method. Receives a message from an specified address
+/// @param message Message to receive
+/// @param i_address Sender's address
+/// @return Void
+void Socket::ReceiveFrom(Message& message, sockaddr_in& i_address) {
+  socklen_t src_len = sizeof(i_address);
+  if (recvfrom(fd_, &message, sizeof(message), 0,
+               reinterpret_cast<sockaddr*>(&i_address), &src_len) < 0) {
+    throw std::system_error(errno, std::system_category(),
+                            "Error receiving message");
+  }
+  // Last characters from arrays should end in '/0'
+  message.ip[19] = 0x00;
+  message.text[1023] = 0x00;
+}
+
+///////////////////////////////////////////////////////
+// EXTERNAL FUNCTIONS
+///////////////////////////////////////////////////////
+
+/// @brief MakeInternetAddress Function. Creates a sockaddr_in with an specified
+/// address and port assigned
+/// @param ip_address Ip Address to assign
+/// @param port Port to assign
+/// @return Void
+sockaddr_in MakeInternetAddress(const std::string& ip_address, int port) {
+  sockaddr_in localAddress{};
+  localAddress.sin_family = DOMAIN;
+  localAddress.sin_port = htons(port);
+
+  if (ip_address.empty())
+    localAddress.sin_addr.s_addr = htonl(INADDR_ANY);
+  else if (inet_aton(ip_address.c_str(), &localAddress.sin_addr) == 0)
+    throw std::system_error(errno, std::system_category(), "Invalid Address");
+
+  return localAddress;
 }

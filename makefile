@@ -1,53 +1,42 @@
-#-----------------------------------------------------------------------------------
-# Makefile
-#-----------------------------------------------------------------------------------
-# Luis Marcelo Chinea Rangel
-# University of La Laguna
-# Higher Polytechnic School of Engineering and Technology
-# Undergraduate degree in Computer Engineering
-# Contact E-mail: alu0101118116@ull.es
-#-----------------------------------------------------------------------------------
+#################################################
+# MAKEFILE
+#################################################
 
-YELLOW=\033[1;33m
-BLUE=\033[0;32m
-DEF=\033[0m
+CXX		 := g++
+CXXFLAGS := -std=c++11 -pthread
 
-CC=g++
-CFLAGS=$(IDIR) -std=c++11 -g
+BIN     := bin
+SRC     := src
+BUILD		:= build
+INCLUDE := -Iinclude
+LIB     := -Llib
+EXECUTABLE  := $(notdir $(CURDIR))
 
-INCLUDE_DIR =include
-OBJECTS_DIR=build
-SRC_DIR =src
-LIB_DIR =lib
-BIN_DIR =bin
-IDIR=-I -Wall -Wextra -pthread
+SOURCES := $(wildcard $(SRC)/*.cpp)
+OBJS	:= $(patsubst $(SRC)/%.cpp,$(BUILD)/%.o,$(SOURCES))
 
-LIBS=-lm
+.PHONY: all project run clean
 
-_OBJ = main.o Talk.o Socket.o
-OBJ = $(patsubst %,$(OBJECTS_DIR)/%,$(_OBJ))
+all: $(BIN)/$(EXECUTABLE)
 
-BIN_NAME = Talk
+$(BIN)/$(EXECUTABLE): $(OBJS)
+	@echo "🚧 Building..."
+	$(CXX) -o $@ $(CXXFLAGS) $(LIB) $(OBJS)
 
-all: Talk
+$(BUILD)/%.o: $(SRC)/%.cpp
+	@echo "🚧 Building..."
+	$(CXX) -c $(INCLUDE) -o $@ $(CXXFLAGS) $<
 
-Talk: $(OBJ)
-	$(CC) -o $(BIN_DIR)/$(BIN_NAME) $^ $(CFLAGS) $(LIBS)
-
-$(OBJECTS_DIR)/Socket.o: $(SRC_DIR)/Socket.cpp
-	$(CC) -c -o $@ $< $(CFLAGS)	
-	
-$(OBJECTS_DIR)/Talk.o: $(SRC_DIR)/Talk.cpp
-	$(CC) -c -o $@ $< $(CFLAGS)		
-
-$(OBJECTS_DIR)/main.o: $(SRC_DIR)/main.cpp
-	$(CC) -c -o $@ $< $(CFLAGS)
+project:
+	clear
+	@echo "📁 Creating Project Structure..."
+	mkdir -p bin build include src
 
 run:
-	./$(BIN_DIR)/$(BIN_NAME) 
-
-.PHONY: clean
+	clear
+	@echo "🚀 Executing..."
+	./$(BIN)/$(EXECUTABLE)
 
 clean:
-	@rm -f $(OBJECTS_DIR)/*.o *~ $(BIN_DIR)/*~ $(BIN_DIR)/*.exe
-	@echo -e "${BLUE}Make: ${YELLOW}Objects Files and Executables cleaned!${DEF}"
+	@echo "🧹 Clearing..."
+	rm -f $(BIN)/* $(BUILD)/*

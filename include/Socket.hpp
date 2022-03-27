@@ -1,64 +1,65 @@
 /// @file Socket.hpp
-/// @brief Class Socket Declaration
-/// @author Luis Marcelo Chinea Rangel\n
-/// University of La Laguna\n
-/// Higher Polytechnic School of Engineering and Technology\n
-/// Undergraduate degree in Computer Engineering\n
-/// @date 11/01/2020
-/// @see Contact E-mail:
-/// alu0101118116@ull.es
-//////////////////////////////////////////////////////////////////
+/// @brief Socket Class Header
 #pragma once
 
+#include <arpa/inet.h>
+#include <fcntl.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+
 #include <array>
-#include <string>
 #include <cstdlib>
 #include <exception>
+#include <string>
 
-#include <fcntl.h>
-#include <unistd.h>
-#include <sys/stat.h>
-#include <arpa/inet.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
+#include "TextMod.hpp"
 
-#include "../include/Color.hpp"
-
+/// Socket Attribute Macros
 #define DOMAIN AF_INET
 #define TYPE SOCK_DGRAM
 #define PROTOCOL 0
 
-using namespace Color;
-
-/// @brief Message Structure
+/** @name Message */
+/// @brief Structure for text messages of Fortalk
 struct Message {
-	/// @brief Indicates if it's File or Text Message
-	bool file = false;
-	/// @brief Sender's Ip
-	array<char, 20> ip;
-	/// @brief Sender's port
-	int port;
-	/// @brief Sender
-	array<char, 100> user;
-	/// @brief Message to sent
-	array<char, 1024> text;
+  bool file = false;
+
+  // Sender's Ip address and Port
+  std::array<char, 20> ip;
+  int port;
+
+  // Sender's Nickname and Text to send
+  std::array<char, 100> user;
+  std::array<char, 1024> text;
 };
 
 /// @class Socket
 class Socket {
-	private:
-		/// File Descriptor
-		int fd_;
-	public:
-		Socket(const string&, const int&);
-		Socket(const sockaddr_in& = sockaddr_in{});
-		~Socket();
-		
-		void sendTo(const Message&, const sockaddr_in&);
-		void receiveFrom(Message&, sockaddr_in&);
-	private:
-		void createSocket();
-		void bindSocket(const sockaddr_in&);
+ private:
+  int fd_;
+
+ public:
+  /** @name Constructors and Destructor */
+  /// @{
+  Socket(const std::string& = "", const int& = 0);
+  Socket(const sockaddr_in& = sockaddr_in{});
+  ~Socket();
+  /// @}
+
+  /** @name Auxiliar Public Methods */
+  /// @{
+  void SendTo(const Message&, const sockaddr_in&);
+  void ReceiveFrom(Message&, sockaddr_in&);
+  /// @}
+
+ private:
+  /** @name Auxiliar Private Methods */
+  /// @{
+  void Build(void);
+  void Bind(const sockaddr_in&);
+  /// @}
 };
-sockaddr_in makeIpAddress(const string&, int);
+sockaddr_in MakeInternetAddress(const std::string&, int);
